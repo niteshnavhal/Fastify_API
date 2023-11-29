@@ -1,7 +1,9 @@
 "use strict";
 
-const path = require("node:path");
+const path = require("path");
 const AutoLoad = require("@fastify/autoload");
+const fsequelize = require("fastify-sequelize");
+const dbPg = require("./sequelize/config/config")();
 const swagger = require("@fastify/swagger");
 const swaggerUi = require("@fastify/swagger-ui");
 const pjson = require("./package.json");
@@ -11,6 +13,23 @@ const options = {};
 
 module.exports = async function (fastify, opts) {
   // Place here your custom code!
+  fastify
+    .register(fsequelize, {
+      ...dbPg,
+      instance: "db", // tells the plugin to create a Sequelize instance with the name "db"
+      models: path.join(__dirname, "sequelize", "tables", "userModel.js"),
+    })
+    .after(async () => {
+      //console.log(fastify.db);
+      require("./sequelize/tables/userModel")(fastify.db);
+      require("./sequelize/tables/blogModel")(fastify.db);
+      try {
+        await fastify.db.sync();
+      } catch (error) {
+        console.log("error sync with db", error);
+      }
+    });
+
   fastify.register(swagger, {
     routePrefix: "/documentation",
     swagger: {

@@ -3,7 +3,7 @@
   "title": "devcatapp",
   "version": "1.0.0",
   "description": "This project was bootstrapped with Fastify-CLI.",
-  "author": "Kakashi Hatake",
+  "author": "",
   "porfolio": "https://niteshnavhal.github.io/myProfile",
   "main": "app.js",
   "directories": {
@@ -15,11 +15,10 @@
     "dev": "fastify start -w -l info -P app.js",
     "info": "fastify print-routes ./routes/root.js",
     "serve": "npm run open_docs_win && fastify start -w -l info -P app.js",
-    "open_docs_win": "start http://127.0.0.2:3001/documentation",
-    "open_docs_mac": "open http://127.0.0.2:3001/documentation"
+    "open_docs_win": "start http://127.0.0.1:3001/documentation",
+    "open_docs_mac": "open http://127.0.0.1:3001/documentation"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "@fastify/autoload": "^5.0.0",
@@ -31,7 +30,10 @@
     "@fastify/swagger-ui": "^1.10.1",
     "fastify": "^4.0.0",
     "fastify-cli": "^5.9.0",
-    "fastify-plugin": "^4.0.0"
+    "fastify-plugin": "^4.0.0",
+    "fastify-sequelize": "^1.0.4",
+    "pg": "^8.11.3",
+    "sequelize": "^6.35.1"
   },
   "devDependencies": {
     "tap": "^16.1.0"
