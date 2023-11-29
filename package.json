@@ -32,6 +32,7 @@
     "fastify-cli": "^5.9.0",
     "fastify-plugin": "^4.0.0",
     "fastify-sequelize": "^1.0.4",
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
     "sequelize": "^6.35.1"
   },
