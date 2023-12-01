@@ -1,5 +1,5 @@
 // for test purposes
-const { DataTypes } = require("sequelize");
+const { DataTypes } = require("fastify-sequelize");
 
 module.exports = (sequelize) => {
   const UserModel = sequelize.define(
