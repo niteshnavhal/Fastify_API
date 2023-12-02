@@ -1,4 +1,4 @@
-const { DataTypes } = require("fastify-sequelize");
+const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
   const Blog = sequelize.define(
