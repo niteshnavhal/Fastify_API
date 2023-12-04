@@ -1,21 +1,83 @@
 "use strict";
+const {
+  DeleteUserService,
+  GetAllUserService,
+  UpdateUserService,
+  SingleUserService,
+  authorize,
+} = require("../../services");
+
 module.exports = async function (fastify, opts) {
   fastify.route({
-    url: "/info/:id/",
-    method: ["GET"],
+    url: "/User/:id/",
+    method: ["POST"],
     // request and response schema
     schema: {
-      summary: "Get user's Data",
-      description: "Returns a given user's data",
+      summary: "Get SingleUser",
+      description: "Returns a given single user data",
       tags: ["User"],
       // (or query) validates the querystring
-      params: {
+      body: {
         type: "object",
         properties: {
-          id: {
-            type: "number",
-            description: "a User id",
+          appUserId: { type: "number", description: "a User id" },
+        },
+        required: ["appUserId"],
+      },
+      // the response needs to be an object with an `hello` property of type 'string'
+      response: {
+        404: {
+          description: "User not found",
+          type: "object",
+          properties: {
+            code: {
+              type: "string",
+            },
+            message: {
+              type: "string",
+            },
           },
+        },
+        401: {
+          description: "User not authorized",
+          type: "object",
+          properties: {
+            code: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+      },
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+    },
+    // called just before the request handler
+    preHandler: [(request, reply) => authorize(request, reply)],
+    // the function that will handle this request
+    handler: async (request, reply) => {
+      try {
+        const result = await SingleUserService(request, reply, fastify);
+        reply.status(200).send(result);
+      } catch (err) {
+        reply.status(500).send(err.message);
+      }
+    },
+  });
+  fastify.route({
+    url: "/User/:id/",
+    method: ["DELETE"],
+    // request and response schema
+    schema: {
+      summary: "Delete user Data",
+      description: "Delete a given user's data",
+      tags: ["User"],
+      // (or query) validates the querystring
+      body: {
+        type: "object",
+        properties: {
+          appUserId: { type: "number" },
         },
       },
       // the response needs to be an object with an `hello` property of type 'string'
@@ -24,19 +86,11 @@ module.exports = async function (fastify, opts) {
           description: "Returns User model",
           type: "object",
           properties: {
-            id: {
-              type: "number",
-              format: "uuid",
-            },
-            firstName: {
+            code: {
               type: "string",
             },
-            lastName: {
+            message: {
               type: "string",
-            },
-            email: {
-              type: "string",
-              format: "email",
             },
           },
         },
@@ -68,26 +122,142 @@ module.exports = async function (fastify, opts) {
       ],
     },
     // called just before the request handler
-    preHandler: async (request, reply) => {
-      if (request.headers.authorization !== process.env.APIKEY) {
-        reply.code(401).send({
-          code: "UNAUTHORIZED",
-          message: `Wrong API key or missing`,
-        });
-        return null;
-      }
-      const { id } = request.params;
-      if (id <= 0) {
-        reply.code(404).send({
-          code: "USER_NOT_FOUND",
-          message: `The user #${id} not found!`,
-        });
-        return null;
-      }
-    },
+    preHandler: [(request, reply) => authorize(request, reply)],
     // the function that will handle this request
     handler: async (request, reply) => {
-      return request.params;
+      try {
+        const result = await DeleteUserService(request, reply, fastify);
+        reply.status(200).send(result);
+      } catch (err) {
+        reply.status(500).send(err.message);
+      }
+    },
+  });
+  fastify.route({
+    url: "/all",
+    method: ["GET"],
+    // request and response schema
+    schema: {
+      summary: "GetAll user's Data",
+      description: "All user's data",
+      tags: ["User"],
+      // (or query) validates the querystring
+      // the response needs to be an object with an `hello` property of type 'string'
+      response: {
+        404: {
+          description: "User not found",
+          type: "object",
+          properties: {
+            code: {
+              type: "string",
+            },
+            message: {
+              type: "string",
+            },
+          },
+        },
+        401: {
+          description: "User not authorized",
+          type: "object",
+          properties: {
+            code: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+      },
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+    },
+    // called just before the request handler
+    preHandler: [(request, reply) => authorize(request, reply)],
+    // the function that will handle this request
+    handler: async (request, reply) => {
+      try {
+        const result = await GetAllUserService(request, reply, fastify);
+        reply.status(200).send(result);
+      } catch (err) {
+        reply.status(500).send(err.message);
+      }
+    },
+  });
+  fastify.route({
+    url: "/Useupdate",
+    method: ["PUT"],
+    // request and response schema
+    schema: {
+      summary: "Update user's Data",
+      description: "Update a given user's data",
+      tags: ["User"],
+      // (or query) validates the querystring
+      body: {
+        type: "object",
+        properties: {
+          appUserName: { type: "string" },
+          appPassword: { type: "string" },
+          appRoleId: { type: "integer" },
+          appName: { type: "string" },
+          appUserType: { type: "integer" },
+          appMobile: { type: "string" },
+          appIsActive: { type: "boolean" },
+          appIsSuperAdmin: { type: "boolean" },
+          appUserId: { type: "integer" },
+        },
+        required: ["appUserName", "appPassword", "appRoleId", "appName"],
+      },
+      // the response needs to be an object with an `hello` property of type 'string'
+      response: {
+        200: {
+          description: "Returns User model",
+          type: "object",
+          properties: {
+            code: {
+              type: "string",
+            },
+            message: {
+              type: "string",
+            },
+          },
+        },
+        404: {
+          description: "User not found",
+          type: "object",
+          properties: {
+            code: {
+              type: "string",
+            },
+            message: {
+              type: "string",
+            },
+          },
+        },
+        401: {
+          description: "User not authorized",
+          type: "object",
+          properties: {
+            code: { type: "string" },
+            message: { type: "string" },
+          },
+        },
+      },
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+    },
+    // called just before the request handler
+    preHandler: [(request, reply) => authorize(request, reply)],
+    // the function that will handle this request
+    handler: async (request, reply) => {
+      try {
+        const result = await UpdateUserService(request, reply, fastify);
+        reply.status(200).send(result);
+      } catch (err) {
+        reply.status(500).send(err.message);
+      }
     },
   });
 };
