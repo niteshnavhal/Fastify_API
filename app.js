@@ -24,7 +24,7 @@ module.exports = async function (fastify, opts) {
       require("./sequelize/tables/userModel")(fastify.db);
       require("./sequelize/tables/blogModel")(fastify.db);
       try {
-        await fastify.db.sync();
+        //await fastify.db.sync();
       } catch (error) {
         console.log("error sync with db", error);
       }
